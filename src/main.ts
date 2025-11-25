@@ -5,63 +5,70 @@ import { buildFeatureFlags, ipcEvents, defaultSourcesOptions, featureSwitchKey, 
 import { type InitMainOptions } from './types.js';
 
 /**
- * Checks if the current macOS version is 15.0 or higher.
- * On macOS 15+, ScreenCaptureKit has known issues that can affect system keyboard shortcuts
- * and global hotkeys (e.g., Raycast), so Core Audio Taps should be used instead.
+ * Checks if Core Audio Taps are available on the current macOS version.
+ * Core Audio Taps are available on macOS 14.2+ and should be preferred over
+ * ScreenCaptureKit because ScreenCaptureKit can interfere with system keyboard
+ * shortcuts and global hotkeys (e.g., Raycast).
+ *
+ * Darwin kernel version mapping:
+ * - macOS 15.x = Darwin 24.x
+ * - macOS 14.x = Darwin 23.x
+ * - macOS 13.x = Darwin 22.x
+ * - macOS 12.x = Darwin 21.x
  */
-const isMacOS15OrHigher = (): boolean => {
+const shouldUseCoreAudioTaps = (): boolean => {
     if (process.platform !== 'darwin') {
         return false;
     }
 
     try {
         const release = os.release();
-        // macOS version = Darwin kernel version - 9
-        // macOS 15 = Darwin 24.x.x
-        const majorVersion = parseInt(release.split('.')[0], 10);
-        return majorVersion >= 24;
+        const [majorStr, minorStr] = release.split('.');
+        const major = parseInt(majorStr, 10);
+        const minor = parseInt(minorStr, 10);
+
+        // Core Audio Taps available on macOS 14.2+ (Darwin 23.2+)
+        // We use this by default to avoid ScreenCaptureKit's keyboard shortcut issues
+        if (major > 23) {
+            return true; // macOS 15+
+        }
+        if (major === 23 && minor >= 2) {
+            return true; // macOS 14.2+
+        }
+        return false;
     } catch {
         return false;
     }
 };
 
 export const initMain = (options: InitMainOptions = {}): void => {
-    // Auto-detect if we should use Core Audio Taps on macOS 15+
-    // ScreenCaptureKit on macOS 15+ has known issues that can affect system keyboard shortcuts
-    const shouldUseCoreAudioTap = options.forceCoreAudioTap ?? isMacOS15OrHigher();
-
     const {
+        forceCoreAudioTap,
         loopbackWithMute = false,
         onAfterGetSources,
         sessionOverride,
         sourcesOptions = defaultSourcesOptions,
-        skipFeatureFlags = false,
-        skipIpcHandlers = false,
     } = options;
 
-    // Only modify feature flags if not explicitly skipped
-    if (!skipFeatureFlags) {
-        // Get other enabled features from the command line.
-        const otherEnabledFeatures = app.commandLine.getSwitchValue(featureSwitchKey)?.split(',');
+    // Use Core Audio Taps by default on macOS 14.2+ to avoid ScreenCaptureKit's
+    // interference with system keyboard shortcuts (Raycast, global hotkeys, etc.)
+    const useCoreAudioTap = forceCoreAudioTap ?? shouldUseCoreAudioTaps();
 
-        // Remove the switch if it exists.
-        if (app.commandLine.hasSwitch(featureSwitchKey)) {
-            app.commandLine.removeSwitch(featureSwitchKey);
-        }
+    // Get other enabled features from the command line.
+    const otherEnabledFeatures = app.commandLine.getSwitchValue(featureSwitchKey)?.split(',');
 
-        // Add the feature flags to the command line with any other user-enabled features concatenated.
-        const currentFeatureFlags = buildFeatureFlags({
-            otherEnabledFeatures,
-            forceCoreAudioTap: shouldUseCoreAudioTap,
-        });
-
-        app.commandLine.appendSwitch(featureSwitchKey, currentFeatureFlags);
+    // Remove the switch if it exists.
+    if (app.commandLine.hasSwitch(featureSwitchKey)) {
+        app.commandLine.removeSwitch(featureSwitchKey);
     }
 
-    // Skip IPC handler registration if requested
-    if (skipIpcHandlers) {
-        return;
-    }
+    // Add the feature flags to the command line with any other user-enabled features concatenated.
+    const currentFeatureFlags = buildFeatureFlags({
+        otherEnabledFeatures,
+        forceCoreAudioTap: useCoreAudioTap,
+    });
+
+    app.commandLine.appendSwitch(featureSwitchKey, currentFeatureFlags);
 
     // Handle the enable loopback audio event.
     ipcMain.handle(ipcEvents.enableLoopbackAudio, () => {
