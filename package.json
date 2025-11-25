@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cp src/types.d.ts dist/",
     "dev": "tsc --watch",
     "clean": "rimraf dist",
     "prepublishOnly": "npm run clean && npm run build",

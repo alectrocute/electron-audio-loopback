@@ -104,16 +104,43 @@ audioElement.play();
 
 If you don't want to remove the video tracks, you can pass `removeVideo: false` to the `getLoopbackAudioMediaStream` function.
 
+## Troubleshooting
+
+### Raycast and Global Keyboard Shortcuts Stop Working (macOS)
+
+If you're experiencing issues where Raycast or other global keyboard shortcuts stop working after initializing this plugin, this is due to the ScreenCaptureKit feature flag (`MacSckSystemAudioLoopbackOverride`) interfering with macOS's event handling system.
+
+**Solutions:**
+
+1. **Automatic (Recommended):** On macOS 15+, the plugin now automatically uses Core Audio Taps instead of ScreenCaptureKit, which doesn't have this issue.
+
+2. **Force Core Audio Taps on older macOS versions:**
+   ```javascript
+   initMain({ forceCoreAudioTap: true });
+   ```
+
+3. **Skip feature flags entirely** (if you don't need audio loopback functionality yet):
+   ```javascript
+   initMain({ skipFeatureFlags: true });
+   ```
+
+4. **Only register IPC handlers without feature flags:**
+   ```javascript
+   initMain({ skipFeatureFlags: true, skipIpcHandlers: false });
+   ```
+
 ## API Reference
 
 ### Main Process Functions
 
 - `initMain(options?: InitMainOptions)`: Initialize the plugin in the main process. Must be called before the app is ready.
   - `sourcesOptions`: The options to pass to the `desktopCapturer.getSources` method.
-  - `forceCoreAudioTap`: Whether to force the use of the Core Audio API on macOS (can be used to bypass bugs for certain macOS versions).
+  - `forceCoreAudioTap`: Whether to force the use of Core Audio Taps instead of ScreenCaptureKit on macOS. **On macOS 15+, this defaults to `true`** to avoid issues with system keyboard shortcuts and global hotkeys.
   - `loopbackWithMute`: Whether to use the loopback audio with mute. Defaults to `false`.
   - `sessionOverride`: The session to override. Defaults to `session.defaultSession`.
   - `onAfterGetSources`: A function that is called after the sources are retrieved. Useful for advanced & unique scenarios. Defaults to `undefined`.
+  - `skipFeatureFlags`: Skip modifying Chromium feature flags entirely. Use this if you're experiencing issues with system keyboard shortcuts or don't need audio loopback. Defaults to `false`.
+  - `skipIpcHandlers`: Skip registering IPC handlers. Use this if you only want to apply the feature flags but handle IPC communication yourself. Defaults to `false`.
 
 ### Renderer Process Functions
 
