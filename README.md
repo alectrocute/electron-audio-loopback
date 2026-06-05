@@ -4,6 +4,10 @@ An Electron plugin for capturing system audio loopback on macOS 12.3+, Windows 1
 
 To play around with a full example, check out the [mic-speaker-streamer](https://github.com/alectrocute/mic-speaker-streamer) repo. It's a simple app that allows you to simultaneously stream your microphone and system audio to a third-party transcription API while also recording both streams into a WAV file. Alternatively, check out the [bundled example in this repo](https://github.com/alectrocute/electron-audio-loopback/tree/main/example).
 
+# History
+
+Between Electron versions 31 and 39, the Chromium shipped inside required hacks to get system audio loopback working properly. This package patches that behavior and allows for system audio capture on all platforms without any extra dependencies like drivers or binaries. Read my blog write-up [here](https://alec.is/posts/bringing-system-audio-loopback-to-electron/) for technical details.
+
 ## Real-World Usage
 
 If your app is using Electron Audio Loopback, [make a PR](https://github.com/alectrocute/electron-audio-loopback/pulls) to add it to the list below! Both open and closed source apps are welcome.
@@ -129,7 +133,10 @@ The plugin registers these IPC handlers automatically, ensure you don't override
 
 ## Requirements
 
-- Electron >= 31.0.1 (this is cruicial, older Electron versions will not work!)
+- Electron >=31.0.1
+  - This is cruicial, older Electron versions will not work with `electron-audio-loopback`.
+- Electron <39.0.0
+  - Electron 39 and up—you're in the clear—you won't require `electron-audio-loopback`, [read more](https://github.com/alectrocute/electron-audio-loopback/issues/7). If you run into system audio capture issues, it's likely a skill issue. Please see [@chrhartm/electron-mic-speaker-loop](https://github.com/chrhartm/electron-mic-speaker-loop) for a working Electron 39 demo that doesn't use any additional dependencies.
 - macOS 12.3+
 - Windows 10+
 - Most Linux distros with PulseAudio as a sound server
