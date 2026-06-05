@@ -4,7 +4,7 @@ An Electron plugin for capturing system audio loopback on macOS 12.3+, Windows 1
 
 To play around with a full example, check out the [mic-speaker-streamer](https://github.com/alectrocute/mic-speaker-streamer) repo. It's a simple app that allows you to simultaneously stream your microphone and system audio to a third-party transcription API while also recording both streams into a WAV file. Alternatively, check out the [bundled example in this repo](https://github.com/alectrocute/electron-audio-loopback/tree/main/example).
 
-# History
+## History
 
 Between Electron versions 31 and 39, the Chromium shipped inside required hacks to get system audio loopback working properly. This package patches that behavior and allows for system audio capture on all platforms without any extra dependencies like drivers or binaries. Read my blog write-up [here](https://alec.is/posts/bringing-system-audio-loopback-to-electron/) for technical details.
 
