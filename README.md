@@ -14,9 +14,6 @@ If your app is using Electron Audio Loopback, [make a PR](https://github.com/ale
 
 - [mic-speaker-streamer](https://github.com/alectrocute/mic-speaker-streamer): An example microphone/system audio transcription app using OpenAI's Realtime API.
 
-
-- [cheats-app] (https://github.com/ArpitJ1993/CHEATS_APP): An open source version of cluely.
-
 ## Installation
 
 ```bash
