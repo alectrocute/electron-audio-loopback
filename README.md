@@ -1,13 +1,14 @@
+> This README will continue after the following paid sponsorship. Revenue from this sponsor helps fund the ongoing development, maintenance, infrastructure and support of this open-source project.
+
+# Recall.ai - API for desktop recording
+
+If you're looking for a hosted desktop recording API, consider checking out [Recall.ai](https://docs.recall.ai/docs/desktop-sdk/?utm_source=github&utm_medium=sponsorship&utm_campaign=alectrocute-electron-audio-loopback), an API that records Zoom, Google Meet, Microsoft Teams, in-person meetings, and more.
+
 # Electron Audio Loopback
 
 An Electron plugin for capturing system audio loopback on macOS 12.3+, Windows 10+ and Linux without any third-party loopback drivers or dependencies.
 
 To play around with a full example, check out the [mic-speaker-streamer](https://github.com/alectrocute/mic-speaker-streamer) repo. It's a simple app that allows you to simultaneously stream your microphone and system audio to a third-party transcription API while also recording both streams into a WAV file. Alternatively, check out the [bundled example in this repo](https://github.com/alectrocute/electron-audio-loopback/tree/main/example).
-
-The following section is a paid sponsorship. Revenue from this sponsor helps fund the ongoing development, maintenance, infrastructure and support of this open-source project:
-
-> ### Recall.ai - API for desktop recording
-> If you're looking for a hosted desktop recording API, consider checking out [Recall.ai](https://docs.recall.ai/docs/desktop-sdk), an API that records Zoom, Google Meet, Microsoft Teams, in-person meetings, and more.
 
 ## History
 
